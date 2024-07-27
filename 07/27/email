@@ -1,0 +1,49 @@
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+
+# メール送信のための関数
+def send_email(subject, body, to_email):
+    # メールアカウント情報
+    from_email = "your_email@example.com"
+    password = "your_email_password"
+    
+    # メールサーバー情報
+    smtp_server = "smtp.example.com"
+    smtp_port = 587
+
+    # メールの作成
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    # メール本文の設定
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # SMTPサーバーに接続
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(from_email, password)
+        
+        # メール送信
+        server.sendmail(from_email, to_email, msg.as_string())
+        print("メール送信に成功しました！")
+    except Exception as e:
+        print(f"メール送信に失敗しました: {e}")
+    finally:
+        server.quit()
+
+# ユーザーのドキュメントフォルダに出力ファイルパスを設定
+output_directory = os.path.join(os.path.expanduser('~'), 'Documents')
+output_file_path = os.path.join(output_directory, '0727_ncbi_result_dev.xlsx')
+
+# メール送信情報
+subject = "データ処理結果"
+body = f"データ処理が完了しました。結果のファイルは次の場所に保存されています: {output_file_path}"
+to_email = "recipient_email@example.com"
+
+# メール送信
+send_email(subject, body, to_email)
