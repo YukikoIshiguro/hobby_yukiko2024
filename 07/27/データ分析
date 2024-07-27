@@ -1,0 +1,53 @@
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# CSVファイルの読み込み
+file_path = 'path_to_your_csv_file.csv'
+df = pd.read_csv(file_path)
+
+# データの概要
+print("データの概要:")
+print(df.head())
+
+# 基本統計量
+print("\n基本統計量:")
+print(df.describe())
+
+# 欠損値の確認
+print("\n欠損値の確認:")
+print(df.isnull().sum())
+
+# ヒストグラムのプロット
+df.hist(bins=30, figsize=(20, 15))
+plt.show()
+
+# 相関行列のプロット
+plt.figure(figsize=(12, 8))
+correlation_matrix = df.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.show()
+
+# 日付列が存在することを前提に、日付ごとのデータを集計し横棒グラフを作成
+if '日付' in df.columns:
+    df['日付'] = pd.to_datetime(df['日付'])
+    daily_data = df.groupby(df['日付'].dt.date).sum().reset_index()
+    
+    # 横棒グラフの作成
+    plt.figure(figsize=(10, 6))
+    plt.barh(daily_data['日付'].astype(str), daily_data.iloc[:, 1], color='skyblue')
+    plt.xlabel('値')
+    plt.ylabel('日付')
+    plt.title('日ごとの値の集計')
+    plt.show()
+
+# ユーザーのドキュメントフォルダに出力ファイルパスを設定
+output_directory = os.path.join(os.path.expanduser('~'), 'Documents')
+output_file_path = os.path.join(output_directory, '0727_ncbi_result_dev.xlsx')
+
+# Excelに保存
+df.to_excel(output_file_path, index=False)
+
+# 完了メッセージ
+print("完了したにゃ(=^・^=)")
